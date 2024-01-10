@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="../static/img/favicon-32x32.png"
+      rel="shortcut icon"
+      type="image/png"
+    />
+    <title>CodeIt</title>
+    <link href="../static/css/styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <nav class="nav-bar">
+      <div class="forum-logo">
+        <h3>CodeIt/</h3>
+        <form id="myForm" action="/on-select-change", method="POST">
+          <select id="subforum" name="subforum" onchange="submitForm()">
+            <option value="all" {% if selected_subforum == 'all' %}selected{% endif %}>All</option>
+            <option value="python" {% if selected_subforum == 'python' %}selected{% endif %}>Python</option>
+            <option value="javascript" {% if selected_subforum == 'javascript' %}selected{% endif %}>JavaScript</option>
+            <option value="c++" {% if selected_subforum == 'c++' %}selected{% endif %}>C++</option>
+            <option value="java" {% if selected_subforum == 'java' %}selected{% endif %}>Java</option>
+          </select>
+        </form>
+      </div>
+      <div class="search-container">
+        <form action="/search", method="POST" >
+          <input type="text" placeholder="Search.." name="search">
+          <button type="submit"><i class="fa fa-search"></i></button>
+        </form>
+      </div>
+      {% if session['logged_in'] %}
+        <a href="/create-post">Post</a>
+      {% endif %}
+      {% if not session['logged_in'] %}
+        <a href="/login-clicked">Login</a>
+        <a href="/register">Register</a>
+      {% endif %}
+      {% if session['logged_in'] %}
+        <a href="/logout">Logout</a>
+        <a href="{{url_for('profile', posted_by=session['name'])}}">Profile</a>
+      {% endif %}
+    </nav>
+    <section class="posts-section">
+      <ul class="posts-list">
+        {% with message = get_flashed_messages() %}
+          <div class="flashed-message">{{message[0]}}</div>
+        {% endwith %}
+        {% for post in posts %}
+          <li class="posts-list-item">
+            <strong><a href="{{url_for('post', post_id=post['PostId'])}}">{{post["PostTitle"]}}</a> - Posted by: <a href="{{url_for('profile', posted_by=post['PostedBy'])}}">{{post["PostedBy"]}}</a></strong><br>
+            <p>{{post["PostContent"]|safe}}</p>
+            <div class="vote-container">
+              <div class="arrow-container">
+                <a class="upvote-arrow" href="{{url_for('upvote_clicked', post_id=post['PostId'])}}"></a>
+                <a class="downvote-arrow" href="{{url_for('downvote_clicked', post_id=post['PostId'])}}"></a>
+              </div>
+              <span class="vote-count">{{ post["Upvotes"] - post["Downvotes"]}}</span>
+              <span class="comment-count">{{ post["CommentCount"] }} Comments</span>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+    <script>
+      function submitForm() {
+          document.getElementById("myForm").submit();
+      }
+  </script>
+  </body>
+</html>
