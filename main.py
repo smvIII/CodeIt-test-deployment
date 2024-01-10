@@ -2,6 +2,7 @@ from flask import Flask, render_template, session, flash, request
 import sqlite3 as sql
 
 app = Flask(__name__)
+app.secret_key = 'secretKey'
                 
 @app.route("/")
 def root():
@@ -308,5 +309,4 @@ def search_submit():
     return render_template('index.html', posts=posts)
 
 if __name__ == "__main__":
-    app.secret_key = 'secretKey'
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
